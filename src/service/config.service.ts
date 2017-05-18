@@ -1,3 +1,7 @@
+const fs = require('fs');
+
+const configFilePath = `${process.cwd()}/config/devices.json`;
+
 interface Device {
     id: string,
     address: string
@@ -7,9 +11,20 @@ export class ConfigService {
     private devices;
 
     constructor() {
-        this.devices = require('../../config/devices.json').devices;
+        console.log(configFilePath);
+        this.devices = require(configFilePath).devices;
 
-        console.log(this.devices);
+        // TODO: refactor this to use fs.watch at some point
+        setInterval(() => this.refreshDevices(), 10000);
+    }
+
+    /**
+     * Returns IDs of devices from config file
+     *
+     * @returns string[]
+     */
+    public getDevices() {
+        return this.devices.map((device: Device) => device.id);
     }
 
     /**
@@ -28,5 +43,15 @@ export class ConfigService {
         }
 
         return address;
+    }
+
+    /**
+     * reload device info from config file
+     */
+    private refreshDevices() {
+        fs.readFile(configFilePath, 'utf8', (err, data) => {
+            if(err) console.log(err);
+            this.devices = JSON.parse(data).devices;
+        });
     }
 }
