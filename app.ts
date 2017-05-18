@@ -16,6 +16,15 @@ interface ColorData {
 const config = new ConfigService();
 
 /**
+ * enable CORS
+ */
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
+/**
  * GET list of IDs of managed devices
  */
 app.get('/devices', (req: express.Request, res: express.Response) => {
