@@ -4,7 +4,9 @@ const configFilePath = `${process.cwd()}/config/devices.json`;
 
 interface Device {
     id: string,
-    address: string
+    address?: string,
+    description: string,
+    hidden?: boolean,
 }
 
 export class ConfigService {
@@ -19,12 +21,16 @@ export class ConfigService {
     }
 
     /**
-     * Returns IDs of devices from config file
+     * Returns devices from config file
      *
-     * @returns string[]
+     * @returns Device[]
      */
     public getDevices() {
-        return this.devices.map((device: Device) => device.id);
+        return this.devices.map((device: Device) => {
+            let viewDevice = Object.assign({}, device);
+            delete(viewDevice.address);
+            return viewDevice;
+        });
     }
 
     /**

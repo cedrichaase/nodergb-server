@@ -15,6 +15,11 @@ interface ColorData {
 
 const config = new ConfigService();
 
+let lastColor = {};
+for (const device of config.getDevices()) {
+    lastColor[device.id] = 'fff';
+}
+
 /**
  * enable CORS
  */
@@ -28,8 +33,15 @@ app.use((req, res, next) => {
  * GET list of IDs of managed devices
  */
 app.get('/devices', (req: express.Request, res: express.Response) => {
+    let devices = config.getDevices();
+
+    devices = devices.map(device => {
+        device['color'] = `#${lastColor[device.id]}`;
+        return device;
+    });
+
     res.status(200);
-    res.send(config.getDevices());
+    res.send(devices);
 });
 
 /**
@@ -54,6 +66,7 @@ io.on('connection', function(socket){
         const rgbClient = dgram.createSocket('udp4');
         rgbClient.send(color, 1337, address, err => {
             if(err) return;
+            lastColor[data.device] = data.color;
             rgbClient.close();
         });
     });
