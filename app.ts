@@ -1,4 +1,5 @@
 import {ConfigService} from "./src/service/config.service";
+import {RgbClient} from "./src/client/rgb.client";
 import * as express from 'express';
 const dgram = require('dgram');
 const app = require('express')();
@@ -14,11 +15,14 @@ interface ColorData {
 }
 
 const config = new ConfigService();
+const rgb = new RgbClient(1337, config);
 
 let lastColor = {};
 for (const device of config.getDevices()) {
     lastColor[device.id] = 'fff';
 }
+
+/* region REST */
 
 /**
  * enable CORS
@@ -44,9 +48,10 @@ app.get('/devices', (req: express.Request, res: express.Response) => {
     res.send(devices);
 });
 
-/**
- * handle websocket stuff
- */
+/* endregion REST */
+
+/* region websocket */
+
 io.on('connection', function(socket){
     console.log('a client connected');
 
@@ -63,15 +68,36 @@ io.on('connection', function(socket){
         const address = config.getIpForDeviceId(data.device);
 
         // send the data via UDP
-        const rgbClient = dgram.createSocket('udp4');
-        rgbClient.send(color, 1337, address, err => {
-            if(err) return;
-            lastColor[data.device] = data.color;
-            rgbClient.close();
-        });
+        rgb.setColor(color, address);
     });
 });
+
+/* endregion websocket */
 
 http.listen(3000, function () {
     console.log('nodergb server listening on port 3000!');
 });
+
+
+/* region udp-server */
+
+const udp = dgram.createSocket('udp4');
+
+udp.on('error', (err) => {
+    console.log(`server error:\n${err.stack}`);
+    udp.close();
+});
+
+udp.on('message', (color, rinfo) => {
+    color = String(color);
+    rgb.broadcastColor(color);
+});
+
+udp.on('listening', () => {
+    let address = udp.address();
+    console.log(`server listening ${address.address}:${address.port}`);
+});
+
+udp.bind(1337);
+
+/* endregion udp-server */

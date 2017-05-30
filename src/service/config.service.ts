@@ -34,6 +34,15 @@ export class ConfigService {
     }
 
     /**
+     * Returns all device IDs from config file
+     *
+     * @returns {[string,string,string,string,string]}
+     */
+    public getDeviceIds() {
+        return this.getDevices().map((device: Device) => device.id);
+    }
+
+    /**
      * Returns the IP Address of the device with given deviceId
      *
      * @param deviceId
