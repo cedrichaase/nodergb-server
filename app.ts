@@ -68,7 +68,7 @@ io.on('connection', function(socket){
         const address = config.getIpForDeviceId(data.device);
 
         // send the data via UDP
-        rgb.setColor(color, address);
+        rgb.setColor(address, color);
     });
 });
 
