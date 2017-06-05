@@ -88,8 +88,23 @@ udp.on('error', (err) => {
     udp.close();
 });
 
-udp.on('message', (color, rinfo) => {
-    color = String(color);
+udp.on('message', (message, rinfo) => {
+    message = String(message).split(':');
+    const color = message.pop();
+
+    let hostdata = message.pop();
+    if (hostdata) {
+        hostdata = hostdata.split('.');
+
+        const host = hostdata.shift();
+
+        hostdata = hostdata.join('.');
+
+        // TODO: relay host data to next host
+
+        rgb.setColorById(host, color);
+    }
+
     rgb.broadcastColor(color);
 });
 
