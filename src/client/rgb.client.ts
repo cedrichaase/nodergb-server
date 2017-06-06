@@ -17,8 +17,10 @@ export class RgbClient {
      * @param address
      * @param color
      */
-    public setColor(address, color) {
-        this.socket.send(color, this.port, address, err => {
+    public setColor(address, color, hostdata=null) {
+        const payload = hostdata ? `${hostdata}:${color}` : color;
+        console.log(address, payload);
+        this.socket.send(payload, this.port, address, err => {
             if(err) return;
             // this.socket.close();
         });
@@ -30,9 +32,9 @@ export class RgbClient {
      * @param id
      * @param color
      */
-    public setColorById(id, color) {
+    public setColorById(id, color, hostdata=null) {
         const ip = this.config.getIpForDeviceId(id);
-        this.setColor(ip, color);
+        this.setColor(ip, color, hostdata);
     }
 
     /**

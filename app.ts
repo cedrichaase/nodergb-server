@@ -100,9 +100,9 @@ udp.on('message', (message, rinfo) => {
 
         hostdata = hostdata.join('.');
 
-        // TODO: relay host data to next host
+        rgb.setColorById(host, color, hostdata);
 
-        rgb.setColorById(host, color);
+        return;
     }
 
     rgb.broadcastColor(color);
