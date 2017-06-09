@@ -19,7 +19,6 @@ export class RgbClient {
      */
     public setColor(address, color, hostdata=null) {
         const payload = hostdata ? `${hostdata}:${color}` : color;
-        console.log(address, payload);
         this.socket.send(payload, this.port, address, err => {
             if(err) return;
             // this.socket.close();

@@ -64,11 +64,18 @@ io.on('connection', function(socket){
      */
     socket.on('set-color', (data: ColorData) => {
         // extract the data as required by UDP interface
+        let hostdata = data.device.split('.');
+
+        const host = hostdata.shift();
+
+        let new_hostdata = hostdata.join('.');
+
+
+        const address = config.getIpForDeviceId(host);
         const color = `${data.color}\n`;
-        const address = config.getIpForDeviceId(data.device);
 
         // send the data via UDP
-        rgb.setColor(address, color);
+        rgb.setColor(address, color, new_hostdata);
     });
 });
 
@@ -95,9 +102,7 @@ udp.on('message', (message, rinfo) => {
     let hostdata = message.pop();
     if (hostdata) {
         hostdata = hostdata.split('.');
-
         const host = hostdata.shift();
-
         hostdata = hostdata.join('.');
 
         rgb.setColorById(host, color, hostdata);
