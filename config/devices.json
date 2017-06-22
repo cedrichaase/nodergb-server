@@ -1,15 +1,19 @@
 {
   "devices": [
     {
-      "id": "bett",
-      "address": "192.168.7.199",
-      "description": "Hinterm Bett"
+      "id": "buehne",
+      "address": "192.168.43.220",
+      "description": "Bühne"
     },
     {
-      "id": "sofa",
-      "address": "192.168.7.209",
-      "description": "Hinterm Sofa",
-      "hidden": true
+      "id": "eingang",
+      "address": "192.168.43.131",
+      "description": "Eingang"
+    },
+    {
+      "id": "home",
+      "address": "192.168.7.228",
+      "description": "Home"
     }
   ]
 }
