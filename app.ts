@@ -39,7 +39,9 @@ app.use((req, res, next) => {
 app.get('/devices', (req: express.Request, res: express.Response) => {
     let devices = config.getDevices();
 
-    devices = devices.map(device => {
+    devices = devices
+        .filter(d => !d.hidden)
+        .map(device => {
         device['color'] = `#${lastColor[device.id]}`;
         return device;
     });
@@ -74,8 +76,11 @@ io.on('connection', function(socket){
         const address = config.getIpForDeviceId(host);
         const color = `${data.color}\n`;
 
+        lastColor[data.device] = data.color;
+
         // send the data via UDP
         rgb.setColor(address, color, new_hostdata);
+        socket.broadcast.emit('color', data);
     });
 });
 

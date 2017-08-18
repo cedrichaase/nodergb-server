@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const configFilePath = `${process.cwd()}/config/devices.json`;
+const configFilePath = require('path').resolve(`${__dirname}/../../config/devices.json`);
 
 interface Device {
     id: string,
