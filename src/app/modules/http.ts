@@ -6,13 +6,18 @@ const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
-module.exports = ({configService, rgbClient}) => {
-    const config = configService;
-    const rgb = rgbClient;
+export class HttpModule implements Module {
+    private config: ConfigService;
+    private rgb: RgbClient;
 
-    return () => {
+    constructor({configService, rgbClient}) {
+        this.config = configService;
+        this.rgb = rgbClient;
+    }
+
+    public init() {
         let lastColor = {};
-        for (const device of config.getDevices()) {
+        for (const device of this.config.getDevices()) {
             lastColor[device.id] = 'fff';
         }
 
@@ -29,7 +34,7 @@ module.exports = ({configService, rgbClient}) => {
          * GET list of IDs of managed devices
          */
         app.get('/devices', (req: express.Request, res: express.Response) => {
-            let devices = config.getDevices();
+            let devices = this.config.getDevices();
 
             devices = devices
                 .filter(d => !d.hidden)
@@ -61,13 +66,13 @@ module.exports = ({configService, rgbClient}) => {
 
                 let new_hostdata = hostdata.join('.');
 
-                const address = config.getIpForDeviceId(host);
+                const address = this.config.getIpForDeviceId(host);
                 const color = `${data.color}\n`;
 
                 lastColor[data.device] = data.color;
 
                 // send the data via UDP
-                rgb.setColor(address, color, new_hostdata);
+                this.rgb.setColor(address, color, new_hostdata);
                 socket.broadcast.emit('color', data);
             });
         });
@@ -75,5 +80,5 @@ module.exports = ({configService, rgbClient}) => {
         http.listen(3000, function() {
             console.log('nodergb server listening on port 3000!');
         });
-    };
-};
+    }
+}

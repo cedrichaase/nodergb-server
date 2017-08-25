@@ -1,17 +1,22 @@
 import {RgbClient} from '../../client/rgb.client';
 const dgram = require('dgram');
 
-module.exports = ({rgbClient}) => {
-    const rgb: RgbClient = rgbClient;
-    const udp = dgram.createSocket('udp4');
+export class RgbRealtimeModule implements Module {
+    private rgb: RgbClient;
+    private socket;
 
-    return () => {
-        udp.on('error', (err) => {
+    constructor({rgbClient}) {
+        this.rgb = rgbClient;
+        this.socket = dgram.createSocket('udp4');
+    }
+
+    public init() {
+        this.socket.on('error', (err) => {
             console.log(`server error:\n${err.stack}`);
-            udp.close();
+            this.socket.close();
         });
 
-        udp.on('message', (message, rinfo) => {
+        this.socket.on('message', (message, rinfo) => {
             message = String(message).split(':');
             const color = message.pop();
 
@@ -21,19 +26,19 @@ module.exports = ({rgbClient}) => {
                 const host = hostdata.shift();
                 hostdata = hostdata.join('.');
 
-                rgb.setColorById(host, color, hostdata);
+                this.rgb.setColorById(host, color, hostdata);
 
                 return;
             }
 
-            rgb.broadcastColor(color);
+            this.rgb.broadcastColor(color);
         });
 
-        udp.on('listening', () => {
-            let address = udp.address();
+        this.socket.on('listening', () => {
+            let address = this.socket.address();
             console.log(`server listening ${address.address}:${address.port}`);
         });
 
-        udp.bind(1337);
+        this.socket.bind(1337);
     }
-};
+}
