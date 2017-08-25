@@ -4,8 +4,10 @@ const dgram = require('dgram');
 export class RgbRealtimeModule implements Module {
     private rgb: RgbClient;
     private socket;
+    private port: number;
 
-    constructor({rgbClient}) {
+    constructor({rgbRealtimePort, rgbClient}) {
+        this.port = rgbRealtimePort;
         this.rgb = rgbClient;
         this.socket = dgram.createSocket('udp4');
     }
@@ -39,6 +41,6 @@ export class RgbRealtimeModule implements Module {
             console.log(`server listening ${address.address}:${address.port}`);
         });
 
-        this.socket.bind(1337);
+        this.socket.bind(this.port);
     }
 }
