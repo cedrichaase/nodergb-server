@@ -9,10 +9,12 @@ const io = require('socket.io')(http);
 export class HttpModule implements Module {
     private config: ConfigService;
     private rgb: RgbClient;
+    private port: number;
 
-    constructor({configService, rgbClient}) {
+    constructor({configService, rgbClient, httpPort}) {
         this.config = configService;
         this.rgb = rgbClient;
+        this.port = httpPort;
     }
 
     public init() {
@@ -21,14 +23,7 @@ export class HttpModule implements Module {
             lastColor[device.id] = 'fff';
         }
 
-        /**
-         * enable CORS
-         */
-        app.use((req, res, next) => {
-            res.header('Access-Control-Allow-Origin', '*');
-            res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-            next();
-        });
+        HttpModule.enableCors(app);
 
         /**
          * GET list of IDs of managed devices
@@ -77,8 +72,16 @@ export class HttpModule implements Module {
             });
         });
 
-        http.listen(3000, function() {
-            console.log('nodergb server listening on port 3000!');
+        http.listen(this.port, () => {
+            console.log(`nodergb server listening on port ${this.port}!`);
+        });
+    }
+
+    private static enableCors(app) {
+        app.use((req, res, next) => {
+            res.header('Access-Control-Allow-Origin', '*');
+            res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+            next();
         });
     }
 }
