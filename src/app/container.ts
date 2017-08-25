@@ -19,13 +19,13 @@ container.register({
 });
 
 container.register({
-    httpModule: asFunction(require('./http'))
+    httpModule: asFunction(require('./modules/http'))
 });
 container.register({
-    udpModule: asFunction(require('./udp'))
+    udpModule: asFunction(require('./modules/udp'))
 });
 container.register({
-    discoveryModule: asFunction(require('./discovery'))
+    discoveryModule: asFunction(require('./modules/discovery'))
 });
 
 export default container;

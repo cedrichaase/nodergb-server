@@ -1,4 +1,4 @@
-import {RgbClient} from '../client/rgb.client';
+import {RgbClient} from '../../client/rgb.client';
 const dgram = require('dgram');
 
 module.exports = ({rgbClient}) => {

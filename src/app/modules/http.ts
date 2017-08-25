@@ -1,7 +1,7 @@
-import {ConfigService} from '../service/config.service';
-import {RgbClient} from '../client/rgb.client';
+import {ConfigService} from '../../service/config.service';
+import {RgbClient} from '../../client/rgb.client';
 import * as express from 'express';
-import {ColorData} from '../interfaces/color-data';
+import {ColorData} from '../../interfaces/color-data';
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
