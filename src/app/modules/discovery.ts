@@ -1,8 +1,9 @@
 const dgram = require('dgram');
 
-module.exports = () => {
+export class DiscoveryModule implements Module {
+    constructor() {}
 
-    return () => {
+    public init() {
         const udpDiscoverRecv = dgram.createSocket('udp4');
 
         udpDiscoverRecv.on('error', (err) => {
@@ -38,5 +39,5 @@ module.exports = () => {
         });
 
         udpDiscoverRecv.bind(1340);
-    };
-};
+    }
+}

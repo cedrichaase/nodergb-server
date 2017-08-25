@@ -1,5 +1,8 @@
 import {RgbClient} from '../client/rgb.client';
 import {ConfigService} from '../service/config.service';
+import {HttpModule} from './modules/http';
+import {DiscoveryModule} from './modules/discovery';
+import {RgbRealtimeModule} from './modules/udp';
 const awilix = require('awilix');
 const { createContainer, asClass, asValue, asFunction } = awilix;
 
@@ -19,13 +22,13 @@ container.register({
 });
 
 container.register({
-    httpModule: asFunction(require('./http'))
+    httpModule: asClass(HttpModule)
 });
 container.register({
-    udpModule: asFunction(require('./udp'))
+    udpModule: asClass(RgbRealtimeModule)
 });
 container.register({
-    discoveryModule: asFunction(require('./discovery'))
+    discoveryModule: asClass(DiscoveryModule)
 });
 
 export default container;

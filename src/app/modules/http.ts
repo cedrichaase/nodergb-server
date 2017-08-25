@@ -1,40 +1,42 @@
-import {ConfigService} from '../service/config.service';
-import {RgbClient} from '../client/rgb.client';
+import {ConfigService} from '../../service/config.service';
+import {RgbClient} from '../../client/rgb.client';
 import * as express from 'express';
-import {ColorData} from '../interfaces/color-data';
+import {ColorData} from '../../interfaces/color-data';
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
-module.exports = ({configService, rgbClient}) => {
-    const config = configService;
-    const rgb = rgbClient;
+export class HttpModule implements Module {
+    private config: ConfigService;
+    private rgb: RgbClient;
+    private port: number;
 
-    return () => {
+    private lastColor: any;
+
+    constructor({configService, rgbClient, httpPort}) {
+        this.config = configService;
+        this.rgb = rgbClient;
+        this.port = httpPort;
+
         let lastColor = {};
-        for (const device of config.getDevices()) {
+        for (const device of this.config.getDevices()) {
             lastColor[device.id] = 'fff';
         }
+    }
 
-        /**
-         * enable CORS
-         */
-        app.use((req, res, next) => {
-            res.header('Access-Control-Allow-Origin', '*');
-            res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-            next();
-        });
+    public init() {
+        HttpModule.enableCors(app);
 
         /**
          * GET list of IDs of managed devices
          */
         app.get('/devices', (req: express.Request, res: express.Response) => {
-            let devices = config.getDevices();
+            let devices = this.config.getDevices();
 
             devices = devices
                 .filter(d => !d.hidden)
                 .map(device => {
-                    device['color'] = `#${lastColor[device.id]}`;
+                    device['color'] = `#${this.lastColor[device.id]}`;
                     return device;
                 });
 
@@ -61,19 +63,27 @@ module.exports = ({configService, rgbClient}) => {
 
                 let new_hostdata = hostdata.join('.');
 
-                const address = config.getIpForDeviceId(host);
+                const address = this.config.getIpForDeviceId(host);
                 const color = `${data.color}\n`;
 
-                lastColor[data.device] = data.color;
+                this.lastColor[data.device] = data.color;
 
                 // send the data via UDP
-                rgb.setColor(address, color, new_hostdata);
+                this.rgb.setColor(address, color, new_hostdata);
                 socket.broadcast.emit('color', data);
             });
         });
 
-        http.listen(3000, function() {
-            console.log('nodergb server listening on port 3000!');
+        http.listen(this.port, () => {
+            console.log(`nodergb server listening on port ${this.port}!`);
         });
-    };
-};
+    }
+
+    private static enableCors(app) {
+        app.use((req, res, next) => {
+            res.header('Access-Control-Allow-Origin', '*');
+            res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+            next();
+        });
+    }
+}
