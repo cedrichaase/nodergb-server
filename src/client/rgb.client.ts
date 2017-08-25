@@ -3,8 +3,13 @@ import {ConfigService} from '../service/config.service';
 
 export class RgbClient {
     private socket;
+    private port: number;
+    private config: ConfigService;
 
-    constructor(private port: number, private config: ConfigService) {
+    constructor({rgbRealtimePort, configService}) {
+        this.port = rgbRealtimePort;
+        this.config = configService;
+
         this.socket = dgram.createSocket('udp4');
     }
 
