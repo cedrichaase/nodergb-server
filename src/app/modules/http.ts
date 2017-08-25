@@ -11,18 +11,20 @@ export class HttpModule implements Module {
     private rgb: RgbClient;
     private port: number;
 
+    private lastColor: any;
+
     constructor({configService, rgbClient, httpPort}) {
         this.config = configService;
         this.rgb = rgbClient;
         this.port = httpPort;
-    }
 
-    public init() {
         let lastColor = {};
         for (const device of this.config.getDevices()) {
             lastColor[device.id] = 'fff';
         }
+    }
 
+    public init() {
         HttpModule.enableCors(app);
 
         /**
@@ -34,7 +36,7 @@ export class HttpModule implements Module {
             devices = devices
                 .filter(d => !d.hidden)
                 .map(device => {
-                    device['color'] = `#${lastColor[device.id]}`;
+                    device['color'] = `#${this.lastColor[device.id]}`;
                     return device;
                 });
 
@@ -64,7 +66,7 @@ export class HttpModule implements Module {
                 const address = this.config.getIpForDeviceId(host);
                 const color = `${data.color}\n`;
 
-                lastColor[data.device] = data.color;
+                this.lastColor[data.device] = data.color;
 
                 // send the data via UDP
                 this.rgb.setColor(address, color, new_hostdata);
