@@ -3,10 +3,10 @@ const fs = require('fs');
 const configFilePath = require('path').resolve(`${__dirname}/../../config/devices.json`);
 
 interface Device {
-    id: string,
-    address?: string,
-    description: string,
-    hidden?: boolean,
+    id: string;
+    address?: string;
+    description: string;
+    hidden?: boolean;
 }
 
 export class ConfigService {
@@ -20,11 +20,6 @@ export class ConfigService {
         setInterval(() => this.refreshDevices(), 10000);
     }
 
-    /**
-     * Returns devices from config file
-     *
-     * @returns Device[]
-     */
     public getDevices() {
         return this.devices.map((device: Device) => {
             let viewDevice = Object.assign({}, device);
@@ -35,8 +30,6 @@ export class ConfigService {
 
     /**
      * Returns all device IDs from config file
-     *
-     * @returns {[string,string,string,string,string]}
      */
     public getDeviceIds() {
         return this.getDevices().map((device: Device) => device.id);
@@ -44,16 +37,12 @@ export class ConfigService {
 
     /**
      * Returns the IP Address of the device with given deviceId
-     *
-     * @param deviceId
-     * @returns {string}
-     * @throws Error
      */
     public getIpForDeviceId(deviceId: string) {
         const device = this.devices.find((device: Device) => device.id == deviceId);
         const address = device.address;
 
-        if(!address) {
+        if (!address) {
             throw new Error('Device not found!');
         }
 
@@ -65,7 +54,9 @@ export class ConfigService {
      */
     private refreshDevices() {
         fs.readFile(configFilePath, 'utf8', (err, data) => {
-            if(err) console.log(err);
+            if (err) {
+                console.log(err);
+            }
             this.devices = JSON.parse(data).devices;
         });
     }

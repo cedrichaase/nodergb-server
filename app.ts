@@ -1,5 +1,5 @@
-import {ConfigService} from "./src/service/config.service";
-import {RgbClient} from "./src/client/rgb.client";
+import {ConfigService} from './src/service/config.service';
+import {RgbClient} from './src/client/rgb.client';
 import * as express from 'express';
 const dgram = require('dgram');
 const app = require('express')();
@@ -10,8 +10,8 @@ const io = require('socket.io')(http);
  * Interface for color data received via websocket
  */
 interface ColorData {
-    color: string,
-    device: string
+    color: string;
+    device: string;
 }
 
 const config = new ConfigService();
@@ -28,8 +28,8 @@ for (const device of config.getDevices()) {
  * enable CORS
  */
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     next();
 });
 
@@ -42,9 +42,9 @@ app.get('/devices', (req: express.Request, res: express.Response) => {
     devices = devices
         .filter(d => !d.hidden)
         .map(device => {
-        device['color'] = `#${lastColor[device.id]}`;
-        return device;
-    });
+            device['color'] = `#${lastColor[device.id]}`;
+            return device;
+        });
 
     res.status(200);
     res.send(devices);
@@ -54,10 +54,10 @@ app.get('/devices', (req: express.Request, res: express.Response) => {
 
 /* region websocket */
 
-io.on('connection', function(socket){
+io.on('connection', function(socket) {
     console.log('a client connected');
 
-    socket.on('disconnect', function(){
+    socket.on('disconnect', function() {
         console.log('client disconnected');
     });
 
@@ -72,7 +72,6 @@ io.on('connection', function(socket){
 
         let new_hostdata = hostdata.join('.');
 
-
         const address = config.getIpForDeviceId(host);
         const color = `${data.color}\n`;
 
@@ -86,10 +85,9 @@ io.on('connection', function(socket){
 
 /* endregion websocket */
 
-http.listen(3000, function () {
+http.listen(3000, function() {
     console.log('nodergb server listening on port 3000!');
 });
-
 
 /* region udp-server */
 
@@ -127,9 +125,7 @@ udp.bind(1337);
 
 /* endregion udp-server */
 
-
 /* region discovery */
-
 
 const udpDiscoverRecv = dgram.createSocket('udp4');
 
@@ -147,8 +143,6 @@ udpDiscoverRecv.on('message', (message, rinfo) => {
 udpDiscoverRecv.on('listening', () => {
     let address = udpDiscoverRecv.address();
     console.log(`server listening ${address.address}:${address.port}`);
-
-
 
     // send hello to broadcast
     const udpDiscoverSend = dgram.createSocket('udp4');

@@ -2,18 +2,19 @@
   "devices": [
     {
       "id": "buehne",
-      "address": "192.168.43.220",
-      "description": "Bühne"
+      "address": "raspberrypi",
+      "description": "Bühne",
+      "children": ["buehne_vorne", "buehne_hinten"]
     },
     {
-      "id": "eingang",
-      "address": "192.168.43.131",
-      "description": "Eingang"
+      "id": "buehne_vorne",
+      "description": "vorn",
+      "name": "0"
     },
     {
-      "id": "home",
-      "address": "192.168.7.228",
-      "description": "Home"
+      "id": "buehne_hinten",
+      "description": "hinten",
+      "name" : "1"
     }
   ]
 }
