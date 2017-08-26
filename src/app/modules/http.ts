@@ -64,8 +64,6 @@ export class HttpModule implements Module {
              * handle color data
              */
             socket.on('set-color', (data: ColorData) => {
-                console.log('color data', data);
-
                 // extract the data as required by UDP interface
                 let hostdata = data.device.split('.');
 
@@ -77,8 +75,6 @@ export class HttpModule implements Module {
                 const color = data.color;
 
                 this.lastColor[data.device] = data.color;
-
-                console.log(address, `x${color}x`, `x${new_hostdata}x`);
 
                 // send the data via UDP
                 this.rgb.setColor(address, color, new_hostdata);
