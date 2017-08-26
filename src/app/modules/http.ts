@@ -21,8 +21,13 @@ export class HttpModule implements Module {
 
         let lastColor = {};
         for (const device of this.config.getDevices()) {
+
+            for (const control of device.controls) {
+                lastColor[control.id] = 'fff';
+            }
             lastColor[device.id] = 'fff';
         }
+
         this.lastColor = lastColor;
     }
 
