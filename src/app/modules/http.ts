@@ -45,6 +45,12 @@ export class HttpModule implements Module {
                 .map(device => {
                     device['color'] = `#${this.lastColor[device.id]}`;
 
+                    if (device.controls) {
+                        device.controls.forEach(control => {
+                            control.color = `#${this.lastColor[control.id]}`;
+                        });
+                    }
+
                     return device;
                 });
 
@@ -75,6 +81,15 @@ export class HttpModule implements Module {
                 const color = data.color;
 
                 this.lastColor[data.device] = data.color;
+
+                const controls = this.config.getControls(data.device);
+
+                if (controls.length) {
+                    controls.forEach(control => {
+                        console.log(control.id);
+                        this.lastColor[control.id] = data.color;
+                    });
+                }
 
                 // send the data via UDP
                 this.rgb.setColor(address, color, new_hostdata);
