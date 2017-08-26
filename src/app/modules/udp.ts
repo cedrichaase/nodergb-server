@@ -19,7 +19,7 @@ export class RgbRealtimeModule implements Module {
         });
 
         this.socket.on('message', (message, rinfo) => {
-            message = String(message).split(':');
+            message = String(message).trim().split(':');
             const color = message.pop();
 
             let hostdata = message.pop();

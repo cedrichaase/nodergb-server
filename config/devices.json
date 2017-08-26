@@ -2,19 +2,21 @@
   "devices": [
     {
       "id": "buehne",
-      "address": "raspberrypi",
+      "address": "192.168.7.228",
       "description": "Bühne",
-      "children": ["buehne_vorne", "buehne_hinten"]
+      "controls": [
+        {"description": "Vorne"},
+        {"description": "Hinten"}
+      ]
     },
     {
-      "id": "buehne_vorne",
-      "description": "vorn",
-      "name": "0"
-    },
-    {
-      "id": "buehne_hinten",
-      "description": "hinten",
-      "name" : "1"
+      "id": "eingang",
+      "address": "192.168.7.228",
+      "description": "Eingang",
+      "controls": [
+        {"description": "Vorne"},
+        {"description": "Hinten"}
+      ]
     }
   ]
 }

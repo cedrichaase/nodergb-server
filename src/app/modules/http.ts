@@ -2,6 +2,7 @@ import {ConfigService} from '../../service/config.service';
 import {RgbClient} from '../../client/rgb.client';
 import * as express from 'express';
 import {ColorData} from '../../interfaces/color-data';
+import {log} from 'util';
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
@@ -22,6 +23,7 @@ export class HttpModule implements Module {
         for (const device of this.config.getDevices()) {
             lastColor[device.id] = 'fff';
         }
+        this.lastColor = lastColor;
     }
 
     public init() {
@@ -37,6 +39,7 @@ export class HttpModule implements Module {
                 .filter(d => !d.hidden)
                 .map(device => {
                     device['color'] = `#${this.lastColor[device.id]}`;
+
                     return device;
                 });
 
@@ -45,10 +48,10 @@ export class HttpModule implements Module {
         });
 
 
-        io.on('connection', function(socket) {
+        io.on('connection', (socket) => {
             console.log('a client connected');
 
-            socket.on('disconnect', function() {
+            socket.on('disconnect', () => {
                 console.log('client disconnected');
             });
 
@@ -56,21 +59,26 @@ export class HttpModule implements Module {
              * handle color data
              */
             socket.on('set-color', (data: ColorData) => {
+                console.log('color data', data);
+
                 // extract the data as required by UDP interface
                 let hostdata = data.device.split('.');
 
                 const host = hostdata.shift();
 
-                let new_hostdata = hostdata.join('.');
+                let new_hostdata = hostdata.join('.').trim();
 
                 const address = this.config.getIpForDeviceId(host);
-                const color = `${data.color}\n`;
+                const color = data.color;
 
                 this.lastColor[data.device] = data.color;
 
+                console.log(address, `x${color}x`, `x${new_hostdata}x`);
+
                 // send the data via UDP
                 this.rgb.setColor(address, color, new_hostdata);
-                socket.broadcast.emit('color', data);
+                // socket.broadcast.emit('color', data);
+                io.sockets.emit('color', data);
             });
         });
 

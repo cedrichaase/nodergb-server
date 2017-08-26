@@ -17,7 +17,7 @@ export class RgbClient {
      * Send a color to a single host identified by IP address
      */
     public setColor(address, color, hostdata = null) {
-        const payload = hostdata ? `${hostdata}:${color}` : color;
+        const payload = hostdata ? `${hostdata}:${color}\n` : color;
         this.socket.send(payload, this.port, address, err => {
             if (err) {
                 return;
