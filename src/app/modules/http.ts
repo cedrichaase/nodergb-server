@@ -85,7 +85,6 @@ export class HttpModule implements Module {
 
                 if (controls.length) {
                     controls.forEach(control => {
-                        console.log(control.id);
                         this.lastColor[control.id] = data.color;
                     });
                 }
