@@ -20,8 +20,14 @@ export class HttpModule implements Module {
 
         let lastColor = {};
         for (const device of this.config.getDevices()) {
+
+            for (const control of device.controls) {
+                lastColor[control.id] = 'fff';
+            }
             lastColor[device.id] = 'fff';
         }
+
+        this.lastColor = lastColor;
     }
 
     public init() {
@@ -37,6 +43,13 @@ export class HttpModule implements Module {
                 .filter(d => !d.hidden)
                 .map(device => {
                     device['color'] = `#${this.lastColor[device.id]}`;
+
+                    if (device.controls) {
+                        device.controls.forEach(control => {
+                            control.color = `#${this.lastColor[control.id]}`;
+                        });
+                    }
+
                     return device;
                 });
 
@@ -45,10 +58,10 @@ export class HttpModule implements Module {
         });
 
 
-        io.on('connection', function(socket) {
+        io.on('connection', (socket) => {
             console.log('a client connected');
 
-            socket.on('disconnect', function() {
+            socket.on('disconnect', () => {
                 console.log('client disconnected');
             });
 
@@ -61,16 +74,26 @@ export class HttpModule implements Module {
 
                 const host = hostdata.shift();
 
-                let new_hostdata = hostdata.join('.');
+                let new_hostdata = hostdata.join('.').trim();
 
                 const address = this.config.getIpForDeviceId(host);
-                const color = `${data.color}\n`;
+                const color = data.color;
 
                 this.lastColor[data.device] = data.color;
 
+                const controls = this.config.getControls(data.device);
+
+                if (controls.length) {
+                    controls.forEach(control => {
+                        console.log(control.id);
+                        this.lastColor[control.id] = data.color;
+                    });
+                }
+
                 // send the data via UDP
                 this.rgb.setColor(address, color, new_hostdata);
-                socket.broadcast.emit('color', data);
+                // socket.broadcast.emit('color', data);
+                io.sockets.emit('color', data);
             });
         });
 
